@@ -46,7 +46,7 @@ def send_email(to_email, first_name, email_body):
     server.starttls()
     server.login(ZOHO_EMAIL, ZOHO_APP_PASSWORD)
 
-    subject = f"Quick note, {first_name}"
+    subject = f"What are your thoughts {first_name}?"
 
     msg = MIMEMultipart()
     msg["From"] = ZOHO_EMAIL
@@ -96,7 +96,7 @@ for idx, row in df.iterrows():
                     send_email(
                         to_email=str(row["Email"]).strip(),
 first_name=str(row.get("First Name", "")).strip(),
-                        email_body=str(row["Generated Email"]).strip()
+                        email_body=str(row["Generated Email"]).strip(),
                     )
                     st.session_state.sent_rows.add(idx)
                     st.success("Sent")

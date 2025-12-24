@@ -10,7 +10,7 @@ from email.mime.multipart import MIMEMultipart
 SMTP_SERVER = "smtp.zoho.in"      # use smtp.zoho.com if not India
 SMTP_PORT = 587
 ZOHO_EMAIL = "arjun@maileasy.co"
-ZOHO_APP_PASSWORD = st.secrets["APP_PASS"]
+ZOHO_APP_PASSWORD = "SMTxCjKFn3BF"
 
 # =========================
 # FILE CONFIG
@@ -28,7 +28,7 @@ st.title("📧 Zoho CSV Email Sender")
 # =========================
 @st.cache_data
 def load_csv():
-    return pd.read_csv(CSV_FILE, encoding="latin1")
+    return pd.read_csv(CSV_FILE, encoding="utf-8")
 
 df = load_csv()
 
@@ -65,7 +65,8 @@ for idx, row in df.iterrows():
     col1, col2, col3, col4, col5, col6 = st.columns([1.5, 1.5, 2.5, 3, 5, 1.2])
 
     with col1:
-        st.write(row.get("First Name", ""))
+        first_name=str(row.get("First Name", "")).strip()
+        st.write(first_name)
 
     with col2:
         st.write(row.get("Last Name", ""))
@@ -77,12 +78,13 @@ for idx, row in df.iterrows():
         st.write(row.get("Company Name", ""))
 
     with col5:
-        st.text_area(
-            label="",
-            value=str(row.get("Generated Email", "")),
-            height=160,
-            key=f"email_{idx}"
-        )
+       st.text_area(
+    label="Generated Email",
+    value=str(row.get("Generated Email", "")),
+    height=160,
+    key=f"email_{idx}",
+    label_visibility="collapsed"
+)   
 
     with col6:
         if idx in st.session_state.sent_rows:
@@ -90,12 +92,14 @@ for idx, row in df.iterrows():
         else:
             if st.button("Send", key=f"send_{idx}"):
                 try:
+
                     send_email(
                         to_email=str(row["Email"]).strip(),
-                        first_name=str(row["First Name"]).strip(),
+first_name=str(row.get("First Name", "")).strip(),
                         email_body=str(row["Generated Email"]).strip()
                     )
                     st.session_state.sent_rows.add(idx)
                     st.success("Sent")
                 except Exception as e:
-                    st.error("Failed")
+                    print(e)
+                    st.error(f"Failed: {e}")
